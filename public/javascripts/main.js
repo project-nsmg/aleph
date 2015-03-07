@@ -7,8 +7,6 @@ var galaxy = require("./galaxy");
 var shaders = require("./shaders");
 var lensflare = require("./lensflare");
 var constrain = require('./utils').constrain;
-var cssworld = require("./cssworld");
-
 //CSS/HTML Setup
 var masterContainer;
 
