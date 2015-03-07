@@ -1,5 +1,56 @@
 extends layout
 
 block content
-  #glContainer
-
+  filter#svg-glow
+    fegaussianblur(in='SourceAlpha', stddeviation='3')
+    feoffset(dx='2', dy='2', result='offsetblur')
+    femerge
+      femergenode
+      femergenode(in='SourceGraphic')
+  div(style='display:none')
+    span#marker_template.marker
+      span.name
+    span#legacy_marker_template.legacymarker
+      span.name
+  #layout
+    #visualization
+      #css-container
+        #css-world
+          #css-camera
+      #glContainer
+    #icon-nav
+    #spectral-graph
+      #heat-map
+      p.left 3,840&deg;K (cooler)
+      p.center 7,300&deg;K
+      p.right 42,000&deg;K (hotter)
+      h5.
+        B-V Stellar Color Index <br />
+        Temperatures in Kelvin
+    #detailContainer(style='padding-top:10%;')
+      #detailTitle
+        span Sun
+        #detailClose
+          p#zoom-back
+          p#ex-out &times;
+      #detailBody
+        p.
+          This is the description of the sun.
+        p.
+          Excerpt from Wikipedia.
+  #star-name
+    span Sun
+  #meta
+    p
+  #minimap
+    #volume
+    #zoom-levels
+      #zoom-backdrop
+      #zoom-cursor
+    #about ?
+  #loader
+    div
+      img(src='./images/loading6.gif', width='50', height='50', alt='', border='0')
+      p#loadtext Loading the galaxy, please wait&hellip;
+  audio#bgmusicA(src='audio/bgmusic.ogg')
+  audio#bgmusicB(src='audio/bgmusic.ogg')
