@@ -2,7 +2,6 @@ var $ = require("jquery");
 var EventEmitter = require("eventEmitter");
 var screen = require("./screen");
 var settings = require("./settings");
-var markers = require("./markers");
 var mousekeyboard = require("./mousekeyboard");
 var utils = require("./utils");
 
@@ -15,6 +14,11 @@ var $cssContainer = $('#css-container');
 var $detailContainer = $('#detailContainer');
 
 var events = new EventEmitter();
+
+var markerThreshold = {
+    min: 400,
+    max: 1500
+};
 
 // Clear cross origin flags
 THREE.ImageUtils.crossOrigin = null;
@@ -110,7 +114,7 @@ function animate() {
     document.body.scrollTop = document.body.scrollLeft = 0;
 
     camera.update();
-    camera.markersVisible = camera.position.z < markers.threshold.max && camera.position.z > markers.threshold.min;
+    camera.markersVisible = camera.position.z < markerThreshold.max && camera.position.z > markerThreshold.min;
 
     lastRotateY = rotateY;
 
@@ -149,10 +153,10 @@ function animate() {
             rotating.rotation.y = module.exports.rotateY;
         }
 
-        var isZoomedIn = camera.position.target.z < markers.threshold.min;
-        var isZoomedToSolarSystem = camera.position.target.z > markers.threshold.min;
+        var isZoomedIn = camera.position.target.z < markerThreshold.min;
+        var isZoomedToSolarSystem = camera.position.target.z > markerThreshold.min;
 
-        if (isZoomedIn && camera.position.z < markers.threshold.min && $detailContainer.css('display') == 'none' && $starName.css('display') == 'none') {
+        if (isZoomedIn && camera.position.z < markerThreshold.min && $detailContainer.css('display') == 'none' && $starName.css('display') == 'none') {
             $starName.fadeIn();
         } else if ((isZoomedToSolarSystem || $detailContainer.css('display') != 'none') && $starName.css('opacity') == 1.0) {
             $starName.fadeOut();
