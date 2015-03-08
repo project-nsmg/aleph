@@ -102,6 +102,7 @@ module.exports = {
     translating: translating,
     galacticCentering: galacticCentering,
     scene: scene,
+    rotating: rotating,
     rotateX: 0,
     rotateY: 0,
     rotateVX: 0,

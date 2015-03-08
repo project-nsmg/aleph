@@ -4,7 +4,8 @@ var $ = require('jquery');
 var EventEmitter = require("eventEmitter");
 
 var shaderList = ['shaders/galacticstars',
-                  'shaders/galacticdust'];
+                  'shaders/galacticdust',
+                  'shaders/datastars'];
 
 var events = new EventEmitter();
 

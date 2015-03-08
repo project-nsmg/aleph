@@ -22,7 +22,13 @@ function setLoadMessage(msg){
     $loadText.html(msg+"&hellip;");
 }
 
+function map(v, i1, i2, o1, o2) {
+    return o1 + (o2 - o1) * (v - i1) / (i2 - i1);
+}
+
 module.exports = {
     random: random,
-    constrain: constrain
+    constrain: constrain,
+    setLoadMessage: setLoadMessage,
+    map: map
 }
