@@ -98,7 +98,7 @@ function handleMWheel( delta ) {
 }
 
 function onMouseWheel( event ){
-    var delta = (event.deltaX + event.deltaY) * event.deltaFactor;
+    var delta = (event.deltaX + event.deltaY) * event.deltaFactor * 0.2;
 
     if (delta)
         handleMWheel(delta);

@@ -17,6 +17,8 @@ var galacticTexture0 = THREE.ImageUtils.loadTexture( "images/galactic_sharp.png"
 var galacticTexture1 = THREE.ImageUtils.loadTexture( "images/galactic_blur.png" );
 var glowSpanTexture = THREE.ImageUtils.loadTexture( "images/glowspan.png" );
 
+var pSystem;
+
 var galacticUniforms = {
     color: { type: "c", value: new THREE.Color( 0xffffff ) },
     texture0: { type: "t", value: galacticTexture0 },
@@ -197,7 +199,7 @@ function generateGalaxy() {
 
     pGalacticSystem.update = function(){
         //reduce the galactic particle sizes when zooming way in (otherwise massive overdraw, drop in fps, too bright..)
-        //galacticUniforms.zoomSize.value = 1.0 + 10000 / camera.position.z;
+        galacticUniforms.zoomSize.value = 1.0 + 10000 / glworld.camera.position.z;
 
         //scale the particles based off of screen size
         var areaOfWindow = window.innerWidth * window.innerHeight;
@@ -205,9 +207,13 @@ function generateGalaxy() {
         galacticUniforms.scale.value = Math.sqrt(areaOfWindow) * 1.5;
         galacticTopMaterial.opacity = galacticShaderMaterial.opacity;
 
-        // console.log( galacticUniforms.zoomSize.value);
-        if( galacticShaderMaterial.opacity < 1 )
-            galacticShaderMaterial.opacity += 0.05;
+        if( glworld.camera.position.z < 2500 ){
+            if( galacticShaderMaterial.opacity > 0 )
+                galacticShaderMaterial.opacity -= 0.05;
+        } else {
+            if( galacticShaderMaterial.opacity < 1 )
+                galacticShaderMaterial.opacity += 0.05;
+        }
 
         if( galacticShaderMaterial.opacity <= 0.0 ){
             pGalacticSystem.visible = false;
