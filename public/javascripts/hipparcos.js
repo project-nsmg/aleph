@@ -3,6 +3,7 @@
 var utils = require("./utils");
 var glworld = require("./glworld");
 var shaders = require("./shaders");
+var THREE = require("threejs");
 
 function loadStarData( dataFile, callback ){
     var xhr = new XMLHttpRequest();
@@ -28,6 +29,7 @@ var datastarHeatVisionTexture = THREE.ImageUtils.loadTexture( "images/sharppoint
 //      bright flashy named stars graphic
 var starPreviewTexture = THREE.ImageUtils.loadTexture( 'images/star_preview.png', undefined, utils.setLoadMessage("Focusing optics")  );
 var starColorGraph = THREE.ImageUtils.loadTexture( 'images/star_color_modified.png' );
+starColorGraph.minFilter = THREE.LinearFilter;
 
 var datastarUniforms = {
     color:     { type: "c", value: new THREE.Color( 0xffffff ) },
@@ -298,7 +300,7 @@ function generateHipparcosStars(){
 
     window.toggleHeatVision = container.toggleHeatVision;
 
-    var pSystem = new THREE.ParticleSystem( pGeo, shaderMaterial );
+    var pSystem = new THREE.PointCloud(pGeo, shaderMaterial);
     pSystem.dynamic = false;
 
     //  set the values to the shader
@@ -371,7 +373,7 @@ function generateHipparcosStars(){
             var geoMatrix = new THREE.Matrix4();
             geoMatrix.setPosition( p.x, 0, p.z );
             geo.applyMatrix( geoMatrix );
-            THREE.GeometryUtils.merge( baseGeometryCombined, geo );
+            baseGeometryCombined.merge(geo);
         }
     }
     var starBases = new THREE.Mesh( baseGeometryCombined, starBaseMaterial );

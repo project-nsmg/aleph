@@ -5,6 +5,7 @@ var EventEmitter = require("eventEmitter");
 var screen = require("./screen");
 var settings = require("./settings");
 var utils = require("./utils");
+var THREE = require("threejs");
 
 var startTime = Date.now();
 var lastRotateY = 0;
@@ -46,7 +47,9 @@ translating.update = function(){
         this.position.copy(this.targetPosition);
 };
 
-var renderer = new THREE.WebGLRenderer({antialias:settings.antialias});
+var renderer = new THREE.WebGLRenderer({
+    antialias: settings.antialias,
+    alpha: true });
 
 renderer.setSize(screen.width, screen.height);
 renderer.domElement.style.width = screen.width + 'px';

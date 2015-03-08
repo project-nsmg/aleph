@@ -1,5 +1,6 @@
 var utils = require("./utils");
 var glworld = require("./glworld");
+var THREE = require("threejs");
 
 var textureFlare0 = THREE.ImageUtils.loadTexture( "images/lensflare/lensflare0.png" );
 var textureFlare1 = THREE.ImageUtils.loadTexture( "images/lensflare/lensflare1.png" );

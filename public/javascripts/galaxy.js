@@ -6,6 +6,7 @@ var shaders = require("./shaders");
 var utils = require("./utils");
 var lensflare = require("./lensflare");
 var glworld = require("./glworld");
+var THREE = require("threejs");
 
 var random = utils.random;
 var constrain = utils.constrain;
@@ -129,7 +130,7 @@ function generateGalaxy() {
         }
     }
 
-    var pGalacticSystem = new THREE.ParticleSystem( pGalaxy, galacticShaderMaterial );
+    var pGalacticSystem = new THREE.PointCloud(pGalaxy, galacticShaderMaterial);
 
     //set the values to the shader
     var values_size = galacticAttributes.size.value;
@@ -329,7 +330,7 @@ function generateDust(){
 		}
 	}
 
-	var pDustSystem = new THREE.ParticleSystem( pGalacticDust, dustShaderMaterial );
+	var pDustSystem = new THREE.PointCloud(pGalacticDust, dustShaderMaterial);
 
 	//	set the values to the shader
 	var values_size = dustAttributes.size.value;

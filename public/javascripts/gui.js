@@ -3,6 +3,7 @@
 var $ = require("jquery");
 var EventEmitter = require("eventEmitter");
 var glworld = require("./glworld");
+var dat = require("dat-gui");
 
 var events = new EventEmitter();
 var camera = glworld.camera;
