@@ -1,3 +1,5 @@
+"use strict";
+
 var $ = require("jquery");
 
 var shaders = require("./shaders");
@@ -212,7 +214,7 @@ function generateGalaxy() {
             plane.visible = true;
         }
 
-        var targetLerp = constrain( Math.pow(camera.position.z / 80000,3 ), 0.0, 1.0 );
+        var targetLerp = constrain( Math.pow(glworld.camera.position.z / 80000,3 ), 0.0, 1.0 );
         if( targetLerp < 0.00001 )
             targetLerp = 0.0;
 

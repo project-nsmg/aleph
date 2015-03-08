@@ -1,8 +1,9 @@
+"use strict";
+
 var $ = require("jquery");
 var EventEmitter = require("eventEmitter");
 var screen = require("./screen");
 var settings = require("./settings");
-var mousekeyboard = require("./mousekeyboard");
 var utils = require("./utils");
 
 var startTime = Date.now();
@@ -29,9 +30,6 @@ scene.add(new THREE.AmbientLight(0x505050));
 var rotating = new THREE.Object3D();
 var galacticCentering = new THREE.Object3D();
 var translating = new THREE.Object3D();
-
-var rotateTargetX = undefined;
-var rotateTargetY = undefined;
 
 galacticCentering.add(translating);
 rotating.add(galacticCentering);
@@ -61,7 +59,7 @@ renderer.generateMipmaps = false;
 var maxAniso = renderer.getMaxAnisotropy();
 
 // Setup the camera
-camera = new THREE.PerspectiveCamera(30, screen.width / screen.height, 0.5, 10000000);
+var camera = new THREE.PerspectiveCamera(30, screen.width / screen.height, 0.5, 10000000);
 camera.position.z = 40000;
 camera.rotation.vx = 0;
 camera.rotation.vy = 0;
@@ -97,6 +95,9 @@ module.exports = {
     ready: function(lambda) {
         events.addListener("ready", lambda);
     },
+    update: function(lambda) {
+        events.addListener("update", lambda);
+    },
     camera: camera,
     translating: translating,
     galacticCentering: galacticCentering,
@@ -119,72 +120,65 @@ function animate() {
     lastRotateY = rotateY;
 
     // Tween the camera if we're not touring.
-    if (!camera.__tour) {
-        module.exports.rotateX += module.exports.rotateVX;
-        module.exports.rotateY += module.exports.rotateVY;
+    module.exports.rotateX += module.exports.rotateVX;
+    module.exports.rotateY += module.exports.rotateVY;
 
-        module.exports.rotateVX *= 0.9;
-        module.exports.rotateVY *= 0.9;
+    module.exports.rotateVX *= 0.9;
+    module.exports.rotateVY *= 0.9;
 
-        if (mousekeyboard.dragging) {
-            module.exports.rotateVX *= 0.6;
-            module.exports.rotateVY *= 0.6;
+    if( module.exports.initialAutoRotate )
+        module.exports.rotateVY = 0.0015;
+
+    // treat the solar system a bit differently
+    // since we are at 0,0,0 floating point percision won't be as big of a problem
+    var spinCutoff = 100;
+    if( translating.position.length() < 0.0001 ){
+        spinCutoff = 2;
+    }
+
+    if( camera.position.z < spinCutoff ){
+        if( starModel ){
+            starModel.rotation.x = module.exports.rotateX;
+            starModel.rotation.y = module.exports.rotateY;
         }
+        rotating.rotation.x = 0;
+        rotating.rotation.y = 0;
+    } else {
+        rotating.rotation.x = module.exports.rotateX;
+        rotating.rotation.y = module.exports.rotateY;
+    }
 
-        if( module.exports.initialAutoRotate )
-            module.exports.rotateVY = 0.0015;
+    var isZoomedIn = camera.position.target.z < markerThreshold.min;
+    var isZoomedToSolarSystem = camera.position.target.z > markerThreshold.min;
 
-        //treat the solar system a bit differently
-        //since we are at 0,0,0 floating point percision won't be as big of a problem
-        var spinCutoff = 100;
-        if( translating.position.length() < 0.0001 ){
-            spinCutoff = 2;
-        }
+    if (isZoomedIn && camera.position.z < markerThreshold.min && $detailContainer.css('display') == 'none' && $starName.css('display') == 'none') {
+        $starName.fadeIn();
+    } else if ((isZoomedToSolarSystem || $detailContainer.css('display') != 'none') && $starName.css('opacity') == 1.0) {
+        $starName.fadeOut();
+    }
 
-        if( camera.position.z < spinCutoff ){
-            if( starModel ){
-                starModel.rotation.x = module.exports.rotateX;
-                starModel.rotation.y = module.exports.rotateY;
-            }
-            rotating.rotation.x = 0;
-            rotating.rotation.y = 0;
-        } else {
-            rotating.rotation.x = module.exports.rotateX;
-            rotating.rotation.y = module.exports.rotateY;
-        }
+    if (isZoomedIn && $cssContainer.css('display') != 'none') {
+        $cssContainer.css({ display: 'none' });
+    } else if (!isZoomedIn && $cssContainer.css('display') == 'none') {
+        $cssContainer.css({ display: 'block' });
+    }
 
-        var isZoomedIn = camera.position.target.z < markerThreshold.min;
-        var isZoomedToSolarSystem = camera.position.target.z > markerThreshold.min;
+    if (isZoomedToSolarSystem && $detailContainer.css('display') != 'none' && !$detailContainer.hasClass('about')) {
+        $detailContainer.fadeOut();
+    }
 
-        if (isZoomedIn && camera.position.z < markerThreshold.min && $detailContainer.css('display') == 'none' && $starName.css('display') == 'none') {
-            $starName.fadeIn();
-        } else if ((isZoomedToSolarSystem || $detailContainer.css('display') != 'none') && $starName.css('opacity') == 1.0) {
-            $starName.fadeOut();
-        }
-
-        if (isZoomedIn && $cssContainer.css('display') != 'none') {
-            $cssContainer.css({ display: 'none' });
-        } else if (!isZoomedIn && $cssContainer.css('display') == 'none') {
-            $cssContainer.css({ display: 'block' });
-        }
-
-        if (isZoomedToSolarSystem && $detailContainer.css('display') != 'none' && !$detailContainer.hasClass('about')) {
-            $detailContainer.fadeOut();
-        }
-
-        if( $detailContainer.css('display') == 'none'/* && starModel.scale.length() < 10 */){
-            camera.position.x *= 0.95;
-        } else {
-            camera.position.x += (camera.position.target.x - camera.position.x) * 0.95;
-        }
+    if( $detailContainer.css('display') == 'none'/* && starModel.scale.length() < 10 */){
+        camera.position.x *= 0.95;
+    } else {
+        camera.position.x += (camera.position.target.x - camera.position.x) * 0.95;
     }
 
     var targetFov = utils.constrain(Math.pow(camera.position.z,2) / 100000, 0.000001, 40);
     camera.fov = targetFov;
-    fovValue = 0.5 / Math.tan(camera.fov * Math.PI / 360) * screen.height;
+    var fovValue = 0.5 / Math.tan(camera.fov * Math.PI / 360) * screen.height;
     camera.updateProjectionMatrix();
 
-    shaderTiming = (Date.now() - startTime )/ 1000;
+    var shaderTiming = (Date.now() - startTime )/ 1000;
 
     rotateYAccumulate += Math.abs(module.exports.rotateY-lastRotateY) * 5;
 

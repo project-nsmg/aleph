@@ -1,4 +1,8 @@
+"use strict";
+
 var $ = require("jquery");
+require("jquery-mousewheel")($);
+
 var glworld = require("./glworld");
 var utils = require("./utils");
 
@@ -18,6 +22,9 @@ var TOUCHMODES = {
 var touchMode = TOUCHMODES.NONE;
 var previousTouchDelta = 0;
 var touchDelta = 0;
+
+var rotateTargetX = undefined;
+var rotateTargetY = undefined;
 
 var histogramPressed;
 
@@ -72,6 +79,7 @@ function onKeyDown( event ){
 
 function handleMWheel( delta ) {
     // camera.scale.z += delta * 0.1;
+    var camera = glworld.camera;
     camera.position.target.z += delta * camera.position.target.z * 0.01;
     camera.position.target.z = utils.constrain( camera.position.target.z, 0.8, 80000 );
     camera.position.target.pz = camera.position.target.z;
@@ -90,15 +98,7 @@ function handleMWheel( delta ) {
 }
 
 function onMouseWheel( event ){
-    var delta = 0;
-
-    if (event.wheelDelta) { /* IE/Opera. */
-        delta = event.wheelDelta/120;
-    }
-    //  firefox
-    else if( event.detail ){
-        delta = -event.detail/3;
-    }
+    var delta = (event.deltaX + event.deltaY) * event.deltaFactor;
 
     if (delta)
         handleMWheel(delta);
@@ -224,6 +224,7 @@ function doCameraRotationFromInteraction(){
     glworld.rotateVY += (mouseX - pmouseX) / 2 * Math.PI / 180 * 0.2;
     glworld.rotateVX += (mouseY - pmouseY) / 2 * Math.PI / 180 * 0.2;
 
+    var camera = glworld.camera;
     camera.rotation.vy += (mouseX - pmouseX) * 0.00005 * camera.position.z / 10000;
     camera.rotation.vx += (mouseY - pmouseY) * 0.00005 * camera.position.z / 10000;
 }
@@ -238,9 +239,17 @@ $(document).ready(function() {
     window.addEventListener( 'mouseup', onDocumentMouseUp, false );
     masterContainer.addEventListener( 'click', onClick, true );
     masterContainer.addEventListener( 'mousewheel', onMouseWheel, false );
+    $(masterContainer).on("mousewheel", onMouseWheel);
     masterContainer.addEventListener( 'keydown', onKeyDown, false);
 
     masterContainer.addEventListener( 'touchstart', touchStart, false );
     window.addEventListener( 'touchend', touchEnd, false );
     window.addEventListener( 'touchmove', touchMove, false );
+});
+
+glworld.update(function() {
+    if (module.exports.dragging) {
+        glworld.rotateVX *= 0.6;
+        glworld.rotateVY *= 0.6;
+    }
 });

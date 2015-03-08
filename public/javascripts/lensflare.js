@@ -1,4 +1,5 @@
 var utils = require("./utils");
+var glworld = require("./glworld");
 
 var textureFlare0 = THREE.ImageUtils.loadTexture( "images/lensflare/lensflare0.png" );
 var textureFlare1 = THREE.ImageUtils.loadTexture( "images/lensflare/lensflare1.png" );
@@ -71,7 +72,7 @@ function lensFlareUpdateCallback( object ) {
     var vecY = -this.positionScreen.y * 2;
     var size = object.size ? object.size : 16000;
 
-    var camDistance = camera.position.length();
+    var camDistance = glworld.camera.position.length();
 
 	var heatVisionValue = 0.0;
 

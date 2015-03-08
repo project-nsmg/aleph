@@ -1,6 +1,11 @@
+"use strict";
+
 var $ = require("jquery");
 var EventEmitter = require("eventEmitter");
+var glworld = require("./glworld");
+
 var events = new EventEmitter();
+var camera = glworld.camera;
 
 var controllers = {
     viewSize: 0.6,
@@ -21,7 +26,7 @@ module.exports = {
 
 $(document).ready(function() {
     var gui = new dat.GUI();
-    gui.domElement.style.display = 'none';
+    // gui.domElement.style.display = 'none';
 
     var c = gui.add(controllers, 'viewSize', 0.01, 4.0);
     c.onChange(function(v) {

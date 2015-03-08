@@ -1,3 +1,5 @@
+"use strict";
+
 var screenWidth, screenHeight;
 var screenWhalf, screenHhalf;
 
