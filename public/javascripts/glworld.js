@@ -77,7 +77,17 @@ camera.scale.z = 0.83;
 
 scene.add(camera);
 
-var windowResize = THREEx.WindowResize(renderer, camera);
+screen.resize(function (){
+    // notify the renderer of the size change
+    renderer.setSize(screen.width, screen.height);
+    renderer.domElement.style.width = screen.width + 'px';
+    renderer.domElement.style.height = screen.height + 'px';
+
+    // update the camera
+    camera.aspect = screen.width / screen.height;
+    camera.updateProjectionMatrix();
+});
+// bind the resize event
 
 // turn it 90 deg
 var rotateY = Math.PI/2;

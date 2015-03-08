@@ -11,7 +11,6 @@ var pressX = 0, pressY = 0;
 
 var scrollbaring = false;
 
-var keyboard = new THREEx.KeyboardState();
 var masterContainer;
 
 var TOUCHMODES = {
@@ -98,7 +97,7 @@ function handleMWheel( delta ) {
 }
 
 function onMouseWheel( event ){
-    var delta = (event.deltaX + event.deltaY) * event.deltaFactor * 0.2;
+    var delta = (event.deltaX + event.deltaY) * event.deltaFactor * 0.12;
 
     if (delta)
         handleMWheel(delta);
