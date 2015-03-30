@@ -22,8 +22,8 @@ if (Meteor.isClient) {
     var scene = new THREE.Scene();
     scene.fog = new THREE.Fog(0x000000, 1500, 2100);
 
-    var amount = 200;
-    var radius = 500;
+    var amount = 200; //density
+    var radius = 2500;
 
     var mapA = THREE.ImageUtils.loadTexture("images/sprite1.png");
     var materialA = new THREE.SpriteMaterial({map: mapA, color: 0xffffff, fog: true});
@@ -41,14 +41,14 @@ if (Meteor.isClient) {
 
       var sprite = new THREE.Sprite(material);
       sprite.position.set(x, y, z);
-      sprite.position.normalize();
+      //sprite.position.normalize();
       sprite.position.multiplyScalar(radius);
 
       var imageWidth = amount;
       var imageHeight = amount;
       var time = Date.now() / 1000;
       var scale = Math.sin(time + sprite.position.x * 0.01) * 0.3 + 1.0;
-      sprite.scale.set(scale * imageWidth, scale * imageHeight, 1.0);
+      sprite.scale.set(50, 50, 1.0);
 
       group.add(sprite);
     }
@@ -64,9 +64,9 @@ if (Meteor.isClient) {
 
       var time = Date.now() / 1000;
 
-      group.rotation.x = time * 0.5;
-      group.rotation.y = time * 0.75;
-      group.rotation.z = time * 1.0;
+      group.rotation.x = time * 0.5 * 0.01;
+      group.rotation.y = time * 0.75 * 0.01;
+      group.rotation.z = time * 1.0 * 0.01;
 
       renderer.render(scene, camera);
     };
