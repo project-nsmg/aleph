@@ -54,6 +54,46 @@ if (Meteor.isClient) {
     }
     scene.add(group);
 
+    var distanceFunction = function(a, b){
+      return Math.pow(a[0] - b[0], 2) +  Math.pow(a[1] - b[1], 2) +  Math.pow(a[2] - b[2], 2);
+    };
+    var positions = new Float32Array(group.children.length * 3);
+    for (var i = 0; i < group.children.length; i++) {
+      positions[i * 3 + 0] = group.children[i].position.x;
+      positions[i * 3 + 1] = group.children[i].position.y;
+      positions[i * 3 + 2] = group.children[i].position.z;
+    }
+    var kdtree = new THREE.TypedArrayUtils.Kdtree(positions, distanceFunction, 3);
+
+    var groupLine = new THREE.Group();
+    var materialLine = new THREE.LineBasicMaterial({color: 0xffa100});
+    for (var i = 0; i < group.children.length; i++) {
+      if (i === 0) {
+        continue;
+      }
+
+      if (Math.random() >= 0.5) {
+        var positionsInRange = kdtree.nearest([
+          group.children[i].position.x,
+          group.children[i].position.y,
+          group.children[i].position.z
+        ], 2);
+
+        if (positionsInRange.length >= 1) {
+          var geometryLine = new THREE.Geometry();
+          geometryLine.vertices.push(group.children[i].position);
+          var x = positionsInRange[0][0].obj[0];
+          var y = positionsInRange[0][0].obj[1];
+          var z = positionsInRange[0][0].obj[2];
+          geometryLine.vertices.push(new THREE.Vector3(x, y, z));
+
+          var line = new THREE.Line(geometryLine, materialLine);
+          groupLine.add(line);
+        }
+      }
+    }
+    group.add(groupLine);
+
     var renderer = new THREE.WebGLRenderer();
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
