@@ -28,6 +28,7 @@ if (Meteor.isClient) {
     var map = THREE.ImageUtils.loadTexture("images/sprite1.png");
     var materialA = new THREE.SpriteMaterial({map: map, color: 0xffffff, fog: true});
     var materialB = new THREE.SpriteMaterial({map: map, color: 0xff5555, fog: true});
+    var materialLine = new THREE.LineBasicMaterial({color: 0xffa100});
 
     var group = new THREE.Group();
     var groupSprite = new THREE.Group();
@@ -36,64 +37,33 @@ if (Meteor.isClient) {
     group.add(groupLine);
     scene.add(group);
 
-    for (var a = 0; a < amount; a++) {
-      var x = Math.random() - 0.5;
-      var y = Math.random() - 0.5;
-      var z = Math.random() - 0.5;
+    var currentSector = new Aleph.Models.Sector(new Aleph.Helpers.Vector2(0, 0),
+                                                200);
 
+    _.each(currentSector.children, function(star) {
       var material = materialA;
-
       var sprite = new THREE.Sprite(material);
-      sprite.position.set(x, y, z);
-      //sprite.position.normalize();
-      sprite.position.multiplyScalar(radius);
-
-      var imageWidth = amount;
-      var imageHeight = amount;
-      var time = Date.now() / 1000;
-      var scale = Math.sin(time + sprite.position.x * 0.01) * 0.3 + 1.0;
+      sprite.position.set(star.position.x, star.position.y, star.position.z);
       sprite.scale.set(50, 50, 1.0);
 
       groupSprite.add(sprite);
-    }
+      star.sprite = sprite;
 
-    var distanceFunction = function(a, b){
-      return Math.pow(a[0] - b[0], 2) +  Math.pow(a[1] - b[1], 2) +  Math.pow(a[2] - b[2], 2);
-    };
-    var positions = new Float32Array(groupSprite.children.length * 3);
-    for (var i = 0; i < groupSprite.children.length; i++) {
-      positions[i * 3 + 0] = groupSprite.children[i].position.x;
-      positions[i * 3 + 1] = groupSprite.children[i].position.y;
-      positions[i * 3 + 2] = groupSprite.children[i].position.z;
-    }
-    var kdtree = new THREE.TypedArrayUtils.Kdtree(positions, distanceFunction, 3);
+      _.each(star.connectedStars, function(connectedStar) {
+        console.log(star.connectedStars);
 
-    var materialLine = new THREE.LineBasicMaterial({color: 0xffa100});
-    for (var i = 0; i < groupSprite.children.length; i++) {
-      if (i === 0) {
-        continue;
-      }
+        var geometryLine = new THREE.Geometry();
+        geometryLine.vertices.push(new THREE.Vector3(star.position.x,
+                                                     star.position.y,
+                                                     star.position.z));
+        geometryLine.vertices.push(new THREE.Vector3(connectedStar.position.x,
+                                                     connectedStar.position.y,
+                                                     connectedStar.position.z));
 
-      if (Math.random() >= 0.5) {
-        var positionsInRange = kdtree.nearest([
-          groupSprite.children[i].position.x,
-          groupSprite.children[i].position.y,
-          groupSprite.children[i].position.z
-        ], 2);
-
-        if (positionsInRange.length >= 1) {
-          var geometryLine = new THREE.Geometry();
-          geometryLine.vertices.push(groupSprite.children[i].position);
-          var x = positionsInRange[0][0].obj[0];
-          var y = positionsInRange[0][0].obj[1];
-          var z = positionsInRange[0][0].obj[2];
-          geometryLine.vertices.push(new THREE.Vector3(x, y, z));
-
-          var line = new THREE.Line(geometryLine, materialLine);
-          groupLine.add(line);
-        }
-      }
-    }
+        var line = new THREE.Line(geometryLine, materialLine);
+        groupLine.add(line);
+      });
+    });
 
     var renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setPixelRatio(window.devicePixelRatio);

@@ -1,5 +1,9 @@
-function Star(position) {
-  this.position = position;
+function Star(id, position) {
+  var self = this;
+
+  self.id = id;
+  self.position = position;
+  self.connectedStars = [];
 }
 
 Namespacer.addTo("Models", {
