@@ -18,30 +18,30 @@ function Sector(id, amount) {
   }
 
   var distanceFunction = function(a, b){
-    return Math.pow(a.position.x - b.position.x, 2) +
-      Math.pow(a.position.y - b.position.y, 2) +
-      Math.pow(a.position.z - b.position.z, 2);
+    return Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2) + Math.pow(a.z - b.z, 2);
   };
 
-  var stars = new Float32Array(self.children.length);
+  var points = [];
   for (var i = 0; i < self.children.length; i++) {
-    stars[i] = self.children[i];
+    points[i] = {
+      x: self.children[i].position.x,
+      y: self.children[i].position.y,
+      z: self.children[i].position.z,
+      id: self.children[i].id
+    }
   }
-  self.kdtree = new Aleph.Helpers.Kdtree(stars, distanceFunction, 1);
+  self.kdtree = new Aleph.Helpers.Kdtree(points, distanceFunction, ["x", "y", "z"]);
 
   _.each(self.children, function(star) {
     if (Math.random() >= 0.5) {
-      var positionsInRange = self.kdtree.nearest([
-        star.id,
-        star.position.x,
-        star.position.y,
-        star.position.z
-      ], 2);
+      var nearest = self.kdtree.nearest({
+        x: star.position.x,
+        y: star.position.y,
+        z: star.position.z
+      }, 2);
 
-      if (positionsInRange.length >= 1) {
-        console.log(positionsInRange[0][0].obj[0]);
-
-        var starId = positionsInRange[0][0].obj[0];
+      if (nearest.length >= 1) {
+        var starId = nearest[0][0].id
         star.connectedStars = [ self.children[starId] ];
       }
     }

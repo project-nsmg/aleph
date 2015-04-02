@@ -50,8 +50,6 @@ if (Meteor.isClient) {
       star.sprite = sprite;
 
       _.each(star.connectedStars, function(connectedStar) {
-        console.log(star.connectedStars);
-
         var geometryLine = new THREE.Geometry();
         geometryLine.vertices.push(new THREE.Vector3(star.position.x,
                                                      star.position.y,
