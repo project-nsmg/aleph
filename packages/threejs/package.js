@@ -13,7 +13,9 @@ Package.describe({
 Package.onUse(function(api) {
   api.versionsFrom('1.0.5');
   api.addFiles(['lib/three.js',
-                'TypedArrayUtils.js'], 'client');
+                'TypedArrayUtils.js',
+                'TrackballControls.js',
+                'Projector.js'], 'client');
   api.export('THREE', 'client');
 });
 

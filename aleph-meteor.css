@@ -1,7 +1,8 @@
 /* CSS declarations go here */
 
 body {
-  margin: 0px !important;
+  margin: 0px;
+  overflow: hidden;
 }
 
 canvas {
