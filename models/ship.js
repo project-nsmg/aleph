@@ -10,6 +10,8 @@ function Ship(speed, fromStar, toStar) {
 
   this.position = fromStar.position.clone();
   this.lastUpdateTime = Date.now();
+
+  Aleph.Update.add(this);
 }
 
 Ship.prototype.update = function() {
