@@ -5,6 +5,8 @@ function render() {
 function animate() {
   requestAnimationFrame(animate);
 
+  Aleph.Update.act();
+
   var time = Date.now() / 1000;
   Aleph.Views.groupMain.rotation.set(time * 0.5 * 0.01, time * 0.75 * 0.01, time * 1.0 * 0.01);
 
