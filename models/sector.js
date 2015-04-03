@@ -46,6 +46,8 @@ function Sector(id, amount) {
       }
     }
   });
+
+  self.children[0].civilization = new Aleph.Models.Civilization([ self.children[0] ]);
 }
 
 Namespacer.addTo("Models", {

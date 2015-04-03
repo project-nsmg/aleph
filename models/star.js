@@ -26,7 +26,11 @@ Star.prototype.update = function() {
     if (!connectedStar.civilization) {
       if (self.population > 2) {
         self.population -= 1;
-        self.civilization.ships.push(new Aleph.Models.Ship(SHIP_SPEED, self, connectedStar));
+        var ship = new Aleph.Models.Ship(SHIP_SPEED, self, connectedStar);
+        if (self.onNewShip) {
+          self.onNewShip(ship);
+        }
+        self.civilization.ships.push(ship);
       }
     }
   });

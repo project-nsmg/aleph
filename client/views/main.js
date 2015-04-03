@@ -32,6 +32,7 @@ function onMouseMove(e) {
     var obj = intersection.object;
 
     obj.stateTouched();
+    obj.makeCivilization = true;
   }
 }
 
@@ -71,6 +72,9 @@ Meteor.startup(function() {
   var groupLine = new THREE.Group();
   groupMain.add(groupLine);
 
+  var groupShip = new THREE.Group();
+  groupMain.add(groupShip);
+
   var currentSector = new Aleph.Models.Sector(new Aleph.Helpers.Vector2(0, 0),
                                               200);
 
@@ -100,6 +104,7 @@ Meteor.startup(function() {
     groupMain: groupMain,
     groupSprite: groupSprite,
     groupLine: groupLine,
+    groupShip: groupShip,
     currentSector: currentSector
   });
 
@@ -108,6 +113,7 @@ Meteor.startup(function() {
 
   Aleph.Views.Star.initializeMaterials();
   Aleph.Views.Connection.initializeMaterials();
+  Aleph.Views.Ship.initializeMaterials();
 
   Namespacer.addTo("Views", {
     stars: updateStars(),

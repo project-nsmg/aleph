@@ -8,6 +8,36 @@ function Star(model) {
 
   this.model = model;
   this.sprite = sprite;
+
+  Aleph.Update.add(this);
+
+  var self = this;
+  this.sprite.stateNormal = function() {
+    self.stateNormal();
+  }
+  this.sprite.stateTouched = function() {
+    self.stateTouched();
+  }
+
+  self.model.onNewShip = function(ship) {
+    new Aleph.Views.Ship(ship);
+  }
+}
+
+Star.prototype.update = function() {
+  if (this.model.civilization) {
+    this.sprite.material = Star.materials.touched;
+  } else {
+    this.sprite.material = Star.materials.normal;
+  }
+
+  if (this.sprite.makeCivilization) {
+    this.sprite.makeCivilization = false;
+    if (!this.model.civilization) {
+      this.model.civilization = new Aleph.Models.Civilization([ this.model ]);
+      this.model.population = 1;
+    }
+  }
 }
 
 Star.initializeMaterials = function() {

@@ -10,6 +10,8 @@ function Ship(speed, fromStar, toStar) {
 
   this.position = fromStar.position.clone();
   this.lastUpdateTime = Date.now();
+  this.fromStar = fromStar;
+  this.toStar = toStar;
 
   Aleph.Update.add(this);
 }
@@ -21,9 +23,9 @@ Ship.prototype.update = function() {
   if (this.progress > 1) { this.progress = 1; }
   if (this.progress < 0) { this.progress = 0; }
 
-  this.position.subVectors(toStar.postion, fromStar.position);
+  this.position.subVectors(this.toStar.position, this.fromStar.position);
   this.position.multiply(this.progress);
-  this.position.add(fromStar);
+  this.position.add(this.fromStar.position);
 
   this.lastUpdateTime = Date.now();
 }
