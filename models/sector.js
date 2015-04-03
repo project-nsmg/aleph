@@ -33,7 +33,7 @@ function Sector(id, amount) {
   self.kdtree = new Aleph.Helpers.Kdtree(points, distanceFunction, ["x", "y", "z"]);
 
   _.each(self.children, function(star) {
-    if (Math.random() >= 0.5) {
+    if (true/*Math.random() >= 0.5*/) {
       var nearest = self.kdtree.nearest({
         x: star.position.x,
         y: star.position.y,
