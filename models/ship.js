@@ -14,6 +14,8 @@ function Ship(speed, fromStar, toStar) {
   this.toStar = toStar;
 
   Aleph.Update.add(this);
+
+  console.log("Ship created");
 }
 
 Ship.prototype.update = function() {
@@ -24,8 +26,10 @@ Ship.prototype.update = function() {
   if (this.progress < 0) { this.progress = 0; }
 
   this.position.subVectors(this.toStar.position, this.fromStar.position);
-  this.position.multiply(this.progress);
+  this.position.multiplyScalar(this.progress);
   this.position.add(this.fromStar.position);
+
+  //console.log(this.position);
 
   this.lastUpdateTime = Date.now();
 }
