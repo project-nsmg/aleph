@@ -33,21 +33,16 @@ function Sector(id, amount) {
   self.kdtree = new Aleph.Helpers.Kdtree(points, distanceFunction, ["x", "y", "z"]);
 
   _.each(self.children, function(star) {
-    if (true/*Math.random() >= 0.5*/) {
-      var nearest = self.kdtree.nearest({
-        x: star.position.x,
-        y: star.position.y,
-        z: star.position.z
-      }, 2);
+    var nearests = self.kdtree.nearest({
+      x: star.position.x,
+      y: star.position.y,
+      z: star.position.z
+    }, 3);
 
-      if (nearest.length >= 1) {
-        var starId = nearest[0][0].id
-        star.connectedStars = [ self.children[starId] ];
-      }
-    }
+    _.each(nearests, function(obj) {
+      star.connectedStars.push(self.children[obj[0].id]);
+    })
   });
-
-  self.children[0].civilization = new Aleph.Models.Civilization([ self.children[0] ]);
 }
 
 Namespacer.addTo("Models", {

@@ -8,7 +8,7 @@ function animate() {
   Aleph.Update.act();
 
   var time = Date.now() / 1000;
-  Aleph.Views.groupMain.rotation.set(time * 0.5 * 0.01, time * 0.75 * 0.01, time * 1.0 * 0.01);
+  //Aleph.Views.groupMain.rotation.set(time * 0.5 * 0.01, time * 0.75 * 0.01, time * 1.0 * 0.01);
 
   render();
   Aleph.Views.controls.update();
@@ -32,28 +32,7 @@ function onMouseMove(e) {
     var obj = intersection.object;
 
     obj.stateTouched();
-    obj.makeCivilization = true;
   }
-}
-
-function updateStars() {
-  var results = [];
-  _.each(Aleph.Views.currentSector.children, function(model) {
-    var starView = new Aleph.Views.Star(model);
-    results.push(starView);
-  });
-  return results;
-}
-
-function updateConnections() {
-  var results = []
-  _.each(Aleph.Views.currentSector.children, function(star) {
-    _.each(star.connectedStars, function(connectedStar) {
-      var connectionView = new Aleph.Views.Connection(star, connectedStar);
-      results.push(connectionView);
-    });
-  });
-  return results;
 }
 
 Meteor.startup(function() {
@@ -75,8 +54,24 @@ Meteor.startup(function() {
   var groupShip = new THREE.Group();
   groupMain.add(groupShip);
 
+  Aleph.Views.initializeMaterials();
+  Aleph.Models.Ship.generateView = Aleph.Views.generateSpriteGenerator(10,
+                                                                       groupShip);
+  Aleph.Models.Ship.generateLineView = Aleph.Views.generateLineGenerator(groupLine);
+  Aleph.Models.Star.generateView = Aleph.Views.generateSpriteGenerator(50,
+                                                                       groupSprite);
   var currentSector = new Aleph.Models.Sector(new Aleph.Helpers.Vector2(0, 0),
                                               200);
+  var currentCivilization = new Aleph.Models.Civilization();
+
+  _.each(currentSector.children, function(star) {
+    if (Math.random() < 0.1) {
+      currentCivilization.colonize(star);
+    }
+  });
+  if (!currentSector.children[0].civilization) {
+    currentCivilization.colonize(currentSector.children[0]);
+  }
 
   var renderer = new THREE.WebGLRenderer({antialias: true});
   renderer.setPixelRatio(window.devicePixelRatio);
@@ -110,15 +105,6 @@ Meteor.startup(function() {
 
   window.addEventListener('mousemove', onMouseMove, false);
   controls.addEventListener('change', render);
-
-  Aleph.Views.Star.initializeMaterials();
-  Aleph.Views.Connection.initializeMaterials();
-  Aleph.Views.Ship.initializeMaterials();
-
-  Namespacer.addTo("Views", {
-    stars: updateStars(),
-    connections: updateConnections()
-  })
 
   animate();
 });

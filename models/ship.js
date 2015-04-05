@@ -1,37 +1,60 @@
-function Ship(speed, fromStar, toStar) {
-  this.progress = 0;
-  this.speed = speed;
+var SPEED = 20;
+
+function Ship(fromStar, toStar, civilization) {
+  var self = this;
+
+  self.progress = 0;
+  self.speed = SPEED;
 
   var a = fromStar.position;
   var b = toStar.position;
-  this.distance = Math.sqrt(Math.pow(a.x - b.x, 2) +
+  self.distance = Math.sqrt(Math.pow(a.x - b.x, 2) +
                             Math.pow(a.y - b.y, 2) +
                             Math.pow(a.z - b.z, 2));
+  self.position = fromStar.position.clone();
+  self.lastUpdateTime = Date.now();
+  self.fromStar = fromStar;
+  self.toStar = toStar;
+  self.civilization = civilization;
 
-  this.position = fromStar.position.clone();
-  this.lastUpdateTime = Date.now();
-  this.fromStar = fromStar;
-  this.toStar = toStar;
-
+  self.view = Ship.generateView(self.position);
+  self.line = Ship.generateLineView(fromStar.position, fromStar.position);
   Aleph.Update.add(this);
 
-  console.log("Ship created");
+  self.view.onCreate();
+  self.line.onCreate();
 }
 
 Ship.prototype.update = function() {
+  var self = this;
   var interval = Date.now() - this.lastUpdateTime;
 
-  this.progress += (interval * this.speed / 1000) / this.distance;
-  if (this.progress > 1) { this.progress = 1; }
-  if (this.progress < 0) { this.progress = 0; }
+  self.view.stateTouched();
+  self.progress += (interval * self.speed / 1000) / self.distance;
+  if (self.progress > 1) { self.progress = 1; }
+  if (self.progress < 0) { self.progress = 0; }
 
-  this.position.subVectors(this.toStar.position, this.fromStar.position);
-  this.position.multiplyScalar(this.progress);
-  this.position.add(this.fromStar.position);
+  if (self.progress === 1) {
+    var index = self.civilization.ships.indexOf(self);
+    if (index > -1) self.civilization.ships.slice(index, 1);
 
-  //console.log(this.position);
+    self.view.onDestroy();
+    self.civilization.colonize(this.toStar);
+    Aleph.Update.remove(this);
+    self.line.geometry.vertices[1].set(this.toStar.position.x,
+                                       this.toStar.position.y,
+                                       this.toStar.position.z);
+    self.line.geometry.verticesNeedUpdate = true;
+  } else {
+    self.position.subVectors(self.toStar.position, self.fromStar.position);
+    self.position.multiplyScalar(self.progress);
+    self.position.add(self.fromStar.position);
+    self.view.position.set(self.position.x, self.position.y, self.position.z);
+    self.line.geometry.vertices[1].set(self.position.x, self.position.y, self.position.z);
+    self.line.geometry.verticesNeedUpdate = true;
+  }
 
-  this.lastUpdateTime = Date.now();
+  self.lastUpdateTime = Date.now();
 }
 
 Namespacer.addTo("Models", {
