@@ -1,7 +1,7 @@
 (defproject aleph "0.1.0-SNAPSHOT"
 
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
+  :description "A galaxy civilization simulation game."
+  :url "https://github.com/project-nsmg/aleph"
 
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [ring-server "0.4.0"]
@@ -32,6 +32,8 @@
   :uberjar-name "aleph.jar"
   :repl-options {:init-ns aleph.handler}
   :jvm-opts ["-server"]
+  :jar-exclusions [#"\.cljx|\.swp|\.swo|\.DS_Store"]
+  :prep-tasks [["cljx" "once"] "javac" "compile"]
 
   :main aleph.core
 
@@ -40,26 +42,21 @@
             [lein-ancient "0.6.5"]
             [lein-cljsbuild "1.0.4"]
             [lein-sassc "0.10.4"]]
-  
 
-  
   :sassc [{:src "resources/scss/screen.scss"
-  :style "nested"
-  :output-to "resources/public/css/screen.css"
-  :import-path "resources/scss"}]
+           :style "nested"
+           :output-to "resources/public/css/screen.css"
+           :import-path "resources/scss"}]
 
   :hooks [leiningen.sassc]
-  
 
   :ring {:handler aleph.handler/app
          :init    aleph.handler/init
          :destroy aleph.handler/destroy
          :uberwar-name "aleph.war"}
-  
-  
+
   :clean-targets ^{:protect false} ["resources/public/js"]
-  
-  
+
   :cljsbuild
   {:builds
    {:app
@@ -70,19 +67,26 @@
       :optimizations :none
       :output-to "resources/public/js/app.js"
       :pretty-print true}}}}
-  
-  
+
+  :cljx
+  {:builds [{:source-paths ["src-cljx"]
+             :output-path "target/classes"
+             :rules :clj}
+            {:source-paths ["src-cljx"]
+             :output-path "target/classes"
+             :rules :cljs}]}
+
   :profiles
   {:uberjar {:omit-source true
              :env {:production true}
-              :hooks [leiningen.cljsbuild]
-              :cljsbuild
-              {:jar true
-               :builds
-               {:app
-                {:source-paths ["env/prod/cljs"]
-                 :compiler {:optimizations :advanced :pretty-print false}}}} 
-             
+             :hooks [leiningen.cljsbuild]
+             :cljsbuild
+             {:jar true
+              :builds
+              {:app
+               {:source-paths ["env/prod/cljs"]
+                :compiler {:optimizations :advanced :pretty-print false}}}}
+
              :aot :all}
    :dev {:dependencies [[ring-mock "0.1.5"]
                         [ring/ring-devel "1.3.2"]
@@ -93,22 +97,21 @@
                         [com.cemerick/piggieback "0.2.0"]
                         [org.clojure/tools.nrepl "0.2.10"]]
          :source-paths ["env/dev/clj"]
-         
-         :plugins [[lein-figwheel "0.2.5"]]
-         
-          :cljsbuild
-          {:builds
-           {:app
-            {:source-paths ["env/dev/cljs"] :compiler {:source-map true}}}} 
-         
-         
+
+         :plugins [[lein-figwheel "0.2.5"]
+                   [com.keminglabs/cljx "0.6.0"]]
+
+         :cljsbuild
+         {:builds
+          {:app
+           {:source-paths ["env/dev/cljs"] :compiler {:source-map true}}}}
+
          :figwheel
          {:http-server-root "public"
           :server-port 3449
           :css-dirs ["resources/public/css"]
           :ring-handler aleph.handler/app}
-         
-         
+
          :repl-options {:init-ns aleph.repl}
          :injections [(require 'pjstadig.humane-test-output)
                       (pjstadig.humane-test-output/activate!)]
