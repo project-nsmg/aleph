@@ -20,9 +20,6 @@
                  [prone "0.8.1"]
                  [buddy "0.5.0"]
                  [org.clojure/clojurescript "0.0-3169" :scope "provided"]
-                 [reagent "0.5.0"]
-                 [reagent-forms "0.4.9"]
-                 [reagent-utils "0.1.4"]
                  [secretary "1.2.3"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [cljs-ajax "0.3.10"]
@@ -50,6 +47,7 @@
            :import-path "resources/scss"}]
 
   :hooks [leiningen.sassc]
+  :auto {"sassc" {:file-pattern  #"\.(scss)$"}}
 
   :ring {:handler aleph.handler/app
          :init    aleph.handler/init
@@ -64,7 +62,6 @@
     {:source-paths ["src-cljs"]
      :compiler
      {:output-dir "resources/public/js/out"
-      :externs ["react/externs/react.js"]
       :optimizations :none
       :output-to "resources/public/js/app.js"
       :pretty-print true}}}}
@@ -100,7 +97,8 @@
          :source-paths ["env/dev/clj"]
 
          :plugins [[lein-figwheel "0.2.5"]
-                   [com.keminglabs/cljx "0.6.0"]]
+                   [com.keminglabs/cljx "0.6.0"]
+                   [lein-auto "0.1.2"]]
 
          :cljsbuild
          {:builds

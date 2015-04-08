@@ -1,47 +1,37 @@
 (ns aleph.core
-  (:require [reagent.core :as reagent :refer [atom]]
-            [secretary.core :as secretary]
-            [reagent.session :as session]
-            [reagent-forms.core :refer [bind-fields]]
+  (:require [secretary.core :as secretary]
             [ajax.core :refer [GET POST]])
   (:require-macros [secretary.core :refer [defroute]]))
 
-(defn navbar []
-      [:div.navbar.navbar-inverse.navbar-fixed-top
-       [:div.container
-        [:div.navbar-header
-         [:a.navbar-brand {:href "#/"} "aleph"]]
-        [:div.navbar-collapse.collapse
-         [:ul.nav.navbar-nav
-          [:li {:class (when (= :home (session/get :page)) "active")}
-           [:a {:on-click #(secretary/dispatch! "#/")} "Home"]]
-          [:li {:class (when (= :about (session/get :page)) "active")}
-           [:a {:on-click #(secretary/dispatch! "#/about")} "About"]]]]]])
+(def scene (js/THREE.Scene.))
+(def camera (js/THREE.PerspectiveCamera. 75
+                                         (/ (.-innerWidth js/window)
+                                            (.-innerHeight js/window))
+                                         0.1
+                                         1000))
+(def renderer (js/THREE.WebGLRenderer.))
 
-(defn about-page []
-  [:div "this is the story of aleph... work in progress"])
+(.setSize renderer
+          (.-innerWidth js/window)
+          (.-innerHeight js/window))
+(.appendChild (.-body js/document) (.-domElement renderer))
 
-(defn home-page []
-  [:div
-   [:h2 "Welcome to ClojureScript"]])
+(def geometry (js/THREE.BoxGeometry. 2 2 2))
+(def material (js/THREE.MeshBasicMaterial. #js {:color 16r00ff00}))
+(def cube (js/THREE.Mesh. geometry material))
+(.add scene cube)
 
-(def pages
-  {:home home-page
-   :about about-page})
+(set! (.-z (.-position camera)) 5)
 
-(defn page []
-  [(pages (session/get :page))])
-
-(defroute "/" [] (session/put! :page :home))
-(defroute "/about" [] (session/put! :page :about))
-
-(defn mount-components []
-  (reagent/render-component [navbar] (.getElementById js/document "navbar"))
-  (reagent/render-component [page] (.getElementById js/document "app")))
+(defn render []
+  (js/requestAnimationFrame render)
+  (set! (.-x (.-rotation cube))
+        (+ (.-x (.-rotation cube)) 0.1))
+  (set! (.-y (.-rotation cube))
+        (+ (.-y (.-rotation cube)) 0.1))
+  (.render renderer scene camera))
 
 (defn init! []
   (secretary/set-config! :prefix "#")
-  (session/put! :page :home)
-  (mount-components))
-
-
+  (println "Hello world!")
+  (render))
