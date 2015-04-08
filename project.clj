@@ -26,7 +26,8 @@
                  [secretary "1.2.3"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [cljs-ajax "0.3.10"]
-                 [org.immutant/web "2.0.0-beta2"]]
+                 [org.immutant/web "2.0.0-beta2"]
+                 [com.taoensso/sente "1.4.1"]]
 
   :min-lein-version "2.0.0"
   :uberjar-name "aleph.jar"
