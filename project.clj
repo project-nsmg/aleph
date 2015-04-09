@@ -32,6 +32,7 @@
   :jvm-opts ["-server"]
   :jar-exclusions [#"\.cljx|\.swp|\.swo|\.DS_Store"]
   :prep-tasks [["cljx" "once"] "javac" "compile"]
+  :source-paths ["src" "target/generated/clj"]
 
   :main aleph.core
 
@@ -47,7 +48,6 @@
            :import-path "resources/scss"}]
 
   :hooks [leiningen.sassc]
-  :auto {"sassc" {:file-pattern  #"\.(scss)$"}}
 
   :ring {:handler aleph.handler/app
          :init    aleph.handler/init
@@ -59,7 +59,7 @@
   :cljsbuild
   {:builds
    {:app
-    {:source-paths ["src-cljs"]
+    {:source-paths ["src-cljs" "target/generated/cljs"]
      :compiler
      {:output-dir "resources/public/js/out"
       :optimizations :none
@@ -68,16 +68,16 @@
 
   :cljx
   {:builds [{:source-paths ["src-cljx"]
-             :output-path "target/classes"
+             :output-path "target/generated/clj"
              :rules :clj}
             {:source-paths ["src-cljx"]
-             :output-path "target/classes"
+             :output-path "target/generated/cljs"
              :rules :cljs}]}
 
   :profiles
   {:uberjar {:omit-source true
              :env {:production true}
-             :hooks [leiningen.cljsbuild]
+             :hooks [leiningen.cljsbuild leiningen.sassc]
              :cljsbuild
              {:jar true
               :builds
@@ -97,8 +97,8 @@
          :source-paths ["env/dev/clj"]
 
          :plugins [[lein-figwheel "0.2.5"]
-                   [com.keminglabs/cljx "0.6.0"]
-                   [lein-auto "0.1.2"]]
+                   [lein-auto "0.1.1"]
+                   [com.keminglabs/cljx "0.6.0"]]
 
          :cljsbuild
          {:builds
@@ -110,6 +110,10 @@
           :server-port 3449
           :css-dirs ["resources/public/css"]
           :ring-handler aleph.handler/app}
+
+         :auto
+         {"sassc" {:file-pattern  #"\.(scss)$"}
+          "cljx" {:file-pattern #"\.(cljx)$"}}
 
          :repl-options {:init-ns aleph.repl}
          :injections [(require 'pjstadig.humane-test-output)

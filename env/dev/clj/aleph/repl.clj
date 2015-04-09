@@ -1,7 +1,8 @@
 (ns aleph.repl
   (:use aleph.handler
     ring.server.standalone
-    [ring.middleware file-info file]))
+    [ring.middleware file-info file])
+  (:require [aleph.dev :refer [start-autoreload]]))
 
 (defonce server (atom nil))
 
@@ -27,7 +28,8 @@
                     :auto-reload? true
                     :destroy destroy
                     :join? false}))
-    (println (str "You can view the site at http://localhost:" port))))
+    (println (str "You can view the site at http://localhost:" port)))
+  (start-autoreload))
 
 (defn stop-server []
   (.stop @server)

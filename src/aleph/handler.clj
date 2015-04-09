@@ -1,7 +1,6 @@
 (ns aleph.handler
   (:require [compojure.core :refer [defroutes routes]]
             [aleph.routes.home :refer [home-routes]]
-            
             [aleph.middleware
              :refer [development-middleware production-middleware]]
             [aleph.session :as session]
@@ -51,7 +50,7 @@
 (def app
   (-> (routes
         home-routes
-        
+
         base-routes)
       development-middleware
       production-middleware))

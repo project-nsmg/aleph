@@ -1,6 +1,7 @@
 (ns aleph.core
   (:require [secretary.core :as secretary]
-            [ajax.core :refer [GET POST]])
+            [ajax.core :refer [GET POST]]
+            [aleph.models :as models])
   (:require-macros [secretary.core :refer [defroute]]))
 
 (def scene (js/THREE.Scene.))
@@ -33,5 +34,5 @@
 
 (defn init! []
   (secretary/set-config! :prefix "#")
-  (println "Hello world!")
+  (println (models/hello-message))
   (render))
