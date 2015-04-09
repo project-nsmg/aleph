@@ -4,35 +4,63 @@
             [aleph.models :as models])
   (:require-macros [secretary.core :refer [defroute]]))
 
-(def scene (js/THREE.Scene.))
-(def camera (js/THREE.PerspectiveCamera. 75
-                                         (/ (.-innerWidth js/window)
-                                            (.-innerHeight js/window))
-                                         0.1
-                                         1000))
-(def renderer (js/THREE.WebGLRenderer.))
+(def scene (let [scene (js/THREE.Scene.)]
+             (set! (.-fog scene) (js/THREE.Fog. 16r000000 1500 2100))
+             scene))
 
-(.setSize renderer
-          (.-innerWidth js/window)
-          (.-innerHeight js/window))
-(.appendChild (.-body js/document) (.-domElement renderer))
+(def camera (let [camera (js/THREE.PerspectiveCamera.
+                          75
+                          (/ (.-innerWidth js/window)
+                             (.-innerHeight js/window))
+                          0.1
+                          5000)]
+              (set! (.-z (.-position camera)) 750)
+              camera))
 
-(def geometry (js/THREE.BoxGeometry. 2 2 2))
-(def material (js/THREE.MeshBasicMaterial. #js {:color 16r00ff00}))
-(def cube (js/THREE.Mesh. geometry material))
-(.add scene cube)
+(def material (let [map (js/THREE.ImageUtils.loadTexture "img/sprite.png")
+                    material (js/THREE.SpriteMaterial. #js
+                                                       {:map map
+                                                        :color 16rffffff
+                                                        :fog true})]
+                (set! (.-minFilter js/THREE.Texture) js/THREE.LinearFilter)
+                material))
 
-(set! (.-z (.-position camera)) 5)
+(def sector (let [sector (models/sector (models/->Index 0 0) 200)]
+              sector))
+
+(def group (let [group (js/THREE.Group.)]
+             (.add scene group)
+             (doseq [star (:stars sector)]
+               (let [sprite (js/THREE.Sprite. material)]
+                 (.set (.-position sprite)
+                       (.-x (:position star))
+                       (.-y (:position star))
+                       (.-z (:position star)))
+                 (.set (.-scale sprite)
+                       50 50 1)
+                 (.add group sprite)))
+             group))
+
+
+(def renderer (let [renderer (js/THREE.WebGLRenderer.)]
+                (.setSize renderer
+                          (.-innerWidth js/window)
+                          (.-innerHeight js/window))
+                (.setPixelRatio renderer
+                                (.-devicePixelRatio js/window))
+                (.appendChild (.-body js/document)
+                              (.-domElement renderer))
+                renderer))
 
 (defn render []
   (js/requestAnimationFrame render)
-  (set! (.-x (.-rotation cube))
-        (+ (.-x (.-rotation cube)) 0.1))
-  (set! (.-y (.-rotation cube))
-        (+ (.-y (.-rotation cube)) 0.1))
+  (let [time (/ (.now js/Date) 1000)]
+    (.set (.-rotation group)
+          (* time 0.5 0.01)
+          (* time 0.75 0.01)
+          (* time 1.0 0.01)))
   (.render renderer scene camera))
 
 (defn init! []
   (secretary/set-config! :prefix "#")
-  (println (models/hello-message))
   (render))
