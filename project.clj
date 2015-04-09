@@ -86,6 +86,7 @@
                 :compiler {:optimizations :advanced :pretty-print false}}}}
 
              :aot :all}
+
    :dev {:dependencies [[ring-mock "0.1.5"]
                         [ring/ring-devel "1.3.2"]
                         [pjstadig/humane-test-output "0.7.0"]
@@ -115,7 +116,8 @@
          {"sassc" {:file-pattern  #"\.(scss)$"}
           "cljx" {:file-pattern #"\.(cljx)$"}}
 
-         :repl-options {:init-ns aleph.repl}
+         :repl-options {:init-ns aleph.repl
+                        :nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
          :injections [(require 'pjstadig.humane-test-output)
                       (pjstadig.humane-test-output/activate!)]
          :env {:dev true}}})
