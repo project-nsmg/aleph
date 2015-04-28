@@ -60,6 +60,7 @@ executable aleph
   build-depends:       base >=4.7 && <4.8
                      , Yampa == 0.9.*
                      , hscurses == 1.4.*
+                     , time == 1.4.*
   
   -- Directories containing source files.
   hs-source-dirs:      src
