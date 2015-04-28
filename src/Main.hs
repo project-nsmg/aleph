@@ -54,5 +54,5 @@ output w _ Nothing = return True
 process :: SF Input Output
 process = arr afun
   where afun (message, timePassed)
-          | timePassed <= 1 = Just message
-          | otherwise       = Nothing
+          | timePassed <= 10 = Just (show timePassed)
+          | otherwise        = Nothing
